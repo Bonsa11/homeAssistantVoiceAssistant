@@ -28,7 +28,7 @@ microphone = sr.Microphone()
 # Python Text-to-Speech (pyttsx3) Constants
 engine = pyttsx3.init()
 engine.setProperty('volume', 1.0)
-engine.setProperty('voice', 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-GB_HAZEL_11.0')
+engine.setProperty('voice', 'english_rp+f3')
 
 # Initial analysis of words that would typically require a Google search
 SEARCH_WORDS = {"who": "who", "what": "what", "when": "when", "where": "where", "why": "why", "how": "how"}
@@ -37,6 +37,8 @@ class Karen:
     def __init__(self):
         self.recognizer = sr.Recognizer()
         self.microphone = sr.Microphone()
+        self.WAKE = 'Karen'
+        self.CONVERSATION_LOG = "Conversation_Log.txt"
 
     # Used to hear the commands after the wake word has been said
     def hear(self, recognizer, microphone, response):
@@ -215,7 +217,7 @@ class Karen:
         webbrowser.open("https://www.google.com/search?q={}".format(command))
 
     # Analyzes the command
-    def analyze(self, command):
+    def analyze(self, command, WAKE):
         try:
 
             if command == "introduce yourself":
@@ -251,9 +253,7 @@ class Karen:
             else:
                 s.speak("I don't know how to do that yet.")
 
-                if LED:
-                    listening_byte = "H"  # H matches the Arduino sketch code for the green color
-                    ser.write(listening_byte.encode("ascii"))  # encodes and sends the serial byte
+        
         except TypeError as e:
             print("Warning: You're getting a TypeError somewhere.", e)
             pass
@@ -262,11 +262,11 @@ class Karen:
             pass
 
     # Used to listen for the wake word
-    def listen(self, recognizer, microphone):
+    def listen(self, recognizer, microphone, WAKE):
         while True:
             try:
                 with microphone as source:
-                    #print("Listening.")
+                    print("Listening.")
                     recognizer.adjust_for_ambient_noise(source)
                     recognizer.dynamic_energy_threshold = 3000
                     audio = recognizer.listen(source, timeout=5.0)
