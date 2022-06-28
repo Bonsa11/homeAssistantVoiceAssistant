@@ -69,19 +69,18 @@ class Karen:
         today = str(date.today())
         today = today
         with open(CONVERSATION_LOG, "a") as f:
-            f.write("Conversation started on: " + today + "\n")
+            f.write(f"Conversation started on: {today}" + "\n")
 
     def search_youtube(self, command):
         search_term = command.replace('search youtube for ', '')
         s.speak(f'searching youtube for {search_term}')
         query = search_term.replace(' ', '+')
         webbrowser.open(f'https://www.youtube.com/results?search_query={str(query)}')
-        pass
 
     # Writes each command from the user to the conversation log
     def remember(self, command):
         with open(CONVERSATION_LOG, "a") as f:
-            f.write("User: " + command + "\n")
+            f.write(f"User: {command}" + "\n")
 
     # Used to answer time/date questions
     def understand_time(self, command):
@@ -100,19 +99,13 @@ class Karen:
         elif "this time last year" in command:
             current_year = today.year
 
-            if current_year % 4 == 0:
-                days_in_current_year = 366
-
-            else:
-                days_in_current_year = 365
+            days_in_current_year = 366 if current_year % 4 == 0 else 365
             date_intent = today - timedelta(days=days_in_current_year)
             return date_intent
 
         elif "last week" in command:
             date_intent = today - timedelta(days=7)
             return date_intent
-        else:
-            pass
 
 
     def light_switch(self, command):
@@ -128,9 +121,9 @@ class Karen:
             ips.append(office_light_ip)
             lights.append('office light')
 
-        s.speak(f'switching {[light for light in lights]}')
+        s.speak(f'switching {list(lights)}')
 
-        if len(ips) > 0:
+        if ips:
             if 'on' in command:
                 for ip in ips:
                     bulb = yeelight.Bulb(ip)
@@ -158,9 +151,9 @@ class Karen:
 
         value = [int(s) for s in command.split() if s.isdigit()][0]
 
-        s.speak(f'Setting Brightness to {value} for {[light for light in lights]}')
+        s.speak(f'Setting Brightness to {value} for {list(lights)}')
 
-        if len(ips) > 0:
+        if ips:
             for ip in ips:
                 bulb = yeelight.Bulb(ip)
                 try:
@@ -192,7 +185,7 @@ class Karen:
         int1, int2 = int(li[0]), int(li[2])
         # this uses the operand from the get_operator function against the two intengers
         result = op(int1, int2)
-        s.speak(str(int1) + " " + li[1] + " " + str(int2) + " equals " + str(result))
+        s.speak(f"{int1} {li[1]} {int2} equals {str(result)}")
 
     # Checks "what is" to see if we're doing math
     def what_is_checker(self, command):
@@ -214,7 +207,7 @@ class Karen:
     # Checks the first word in the command to determine if it's a search word
     def use_search_words(self, command):
         s.speak("Here is what I found.")
-        webbrowser.open("https://www.google.com/search?q={}".format(command))
+        webbrowser.open(f"https://www.google.com/search?q={command}")
 
     # Analyzes the command
     def analyze(self, command, WAKE):
@@ -253,13 +246,11 @@ class Karen:
             else:
                 s.speak("I don't know how to do that yet.")
 
-        
+
         except TypeError as e:
             print("Warning: You're getting a TypeError somewhere.", e)
-            pass
         except AttributeError as e:
             print("Warning: You're getting an Attribute Error somewhere.", e)
-            pass
 
     # Used to listen for the wake word
     def listen(self, recognizer, microphone, WAKE):
@@ -275,9 +266,6 @@ class Karen:
                     if WAKE in response:
                         s.speak(random.choice(['Hi!', 'Hello!', 'Hi Sam', 'Hello Sam', 'Yes Sam?', 'Yes?']))
                         return response.lower()
-                    else:
-                        pass
-
             except sr.WaitTimeoutError:
                 pass
             except sr.UnknownValueError:
